@@ -1,0 +1,8 @@
+- name: installing vim 
+  yum:
+    name: "vim"
+    state: "installed"
+
+- name: getting varaible from main file
+  debug:
+    msg: " getting from main tasks  {{ serv }}"

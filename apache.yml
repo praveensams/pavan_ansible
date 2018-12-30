@@ -1,0 +1,48 @@
+- hosts: test
+  become: true
+  gather_facts: True
+
+  tasks:
+    - name: installing packages when redhat
+      yum:
+        name: ['httpd','httpd-tools']
+        state: "installed" 
+      when: ( ansible_os_family ==  "RedHat" ) or ( ansible_os_family == "redhat" )
+ 
+ 
+    - name: installing packages when ubuntu
+      apt:
+        name: ['httpd','httpd-tools']
+        state: "installed" 
+      when: ( ansible_os_family ==  "Debian" )
+
+    - name: Finding users and names
+      shell: |
+          echo "Total number of users " $( ls /home | wc -l )
+          echo "The users are  " $(ls /home )
+      register: result
+
+ 
+    - name: copying the configuration file
+      template:
+        src: "httpd.conf.j2"
+        dest: "/etc/httpd/conf/httpd.conf"
+      notify: restarts
+
+    - name: Creating file index.html
+      copy: 
+        content: " {{ result.stdout }}"
+        dest: "/var/www/html/index.html"
+      
+ 
+    - name: staring the apache
+      service:
+        name: "httpd"
+        state: "started"
+    
+  handlers:
+    - name: restarts
+      service:
+        name: "httpd"
+        state: "restarted"
+     

@@ -1,0 +1,15 @@
+- hosts: test
+  become: true
+
+  tasks:
+
+    name: creating folder
+    file:
+      name: "/mnt/praveen"
+      state: directory
+
+    name: create a file under the folder
+    copy:
+      content: |
+            I am going to create a file
+      dest: "/mnt/praveen/sam" 

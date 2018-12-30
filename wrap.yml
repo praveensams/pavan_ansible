@@ -1,0 +1,8 @@
+- hosts: kubnode
+  become: true
+  vars:
+    contents: "{{ lookup('file', '/tmp/sar') }}"
+
+
+  roles:
+    - "apache"

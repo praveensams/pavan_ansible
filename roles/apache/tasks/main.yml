@@ -1,0 +1,67 @@
+---
+# tasks file for apache
+
+- name: This block will run only on valiadtion
+  block:
+
+    - name: setting up variable
+      set_fact:
+        serv: "httpd"
+      when: ( ansible_os_family == "RedHat" ) 
+    
+    
+    - name: installing packages for apache
+      yum:
+        name: "{{ pack }}"
+        state: "installed"
+    
+    - name: template configuration 
+      template: 
+        src: "httpd.conf.j2"
+        dest: "/etc/httpd/conf/httpd.conf"
+      notify: restart
+    
+    - name: starting the service
+      service:
+        name: "{{ serv }}"
+        state: "started"
+    
+    - name: ading playbook
+      import_tasks: sam.yml
+      tags: calling
+    
+    - name: Downloading the code
+      git:
+        repo: https://github.com/praveensams/morning-apache.git
+        dest: "/var/www/html/code"
+    
+    - name: running a shell
+      script: "{{ role_path }}/defaults/sam.sh" 
+      register: result
+    
+    - name: displaying the results
+      debug:
+        msg: "{{ result.stdout }}"
+    
+    - name: runnnig a shell commads
+      shell: |
+           ifconfig
+      register: result2
+      ignore_errors: True
+    
+    - name: Stopping after validation
+      meta: end_play
+      when: ( 'found' in result2.stderr )
+    
+    - name: displyaing the error
+      debug:
+        msg: "{{ result2.stderr }}"
+    
+    - name: displyaing the error
+      debug:
+        msg: "{{ serv }}"
+    
+    - name: readnig the content
+      debug:
+        msg: "{{ contents }}"
+  when: ( run == "yes" )  
