@@ -1,4 +1,4 @@
-- hosts: kubnode
+- hosts: "{{ host_name }}"
   become: true
   vars:
     contents: "{{ lookup('file', '/tmp/sar') }}"
